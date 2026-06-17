@@ -104,7 +104,7 @@ export function Logs() {
       {logsError && (
         <div className="error-banner" role="alert">
           <AlertCircle size={20} />
-          <span className="error-banner-text">{t('common.loadError')}</span>
+          <span className="error-banner-text">{t('dashboard.loadError')}</span>
         </div>
       )}
 
