@@ -29,20 +29,8 @@ export class SessionController {
     private readonly auditService: AuditService,
   ) {}
 
-  // Transform entity to DTO with lastActive field name
   private transformSession(session: Session): SessionResponseDto {
-    return {
-      id: session.id,
-      name: session.name,
-      status: session.status,
-      phone: session.phone,
-      pushName: session.pushName,
-      connectedAt: session.connectedAt,
-      lastActive: session.lastActiveAt,
-      createdAt: session.createdAt,
-      updatedAt: session.updatedAt,
-      lastError: session.lastError ?? null,
-    };
+    return SessionResponseDto.fromEntity(session);
   }
 
   @Post()

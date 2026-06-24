@@ -2,9 +2,10 @@ import { z } from 'zod';
 import { ApiKeyRole } from '../../../modules/auth/entities/api-key.entity';
 import type { ChatState } from '../../../engine/interfaces/whatsapp-engine.interface';
 import type { SessionService } from '../../../modules/session/session.service';
+import { SessionResponseDto } from '../../../modules/session/dto/session-response.dto';
 import type { ToolDescriptor } from '../tool-descriptor';
 
-const sessionId = z.string().describe('Session UUID (the session id, not the name)');
+const sessionId = z.string().min(1).describe('Session UUID (the session id, not the name)');
 
 export function sessionTools(session: SessionService): ToolDescriptor[] {
   return [
@@ -14,7 +15,8 @@ export function sessionTools(session: SessionService): ToolDescriptor[] {
         'List the WhatsApp sessions this API key may access (id, name, status). Use to discover available sessions before calling session-scoped tools.',
       tier: 'read',
       inputSchema: z.object({}),
-      handler: (_input, apiKey) => session.findAll(apiKey.allowedSessions),
+      handler: (_input, apiKey) =>
+        session.findAll(apiKey.allowedSessions).then(ss => ss.map(s => SessionResponseDto.fromEntity(s))),
     },
     {
       name: 'SessionFindOne',
@@ -22,7 +24,8 @@ export function sessionTools(session: SessionService): ToolDescriptor[] {
       tier: 'read',
       sessionScoped: true,
       inputSchema: z.object({ sessionId }),
-      handler: (input: { sessionId: string }) => session.findOne(input.sessionId),
+      handler: (input: { sessionId: string }) =>
+        session.findOne(input.sessionId).then(s => SessionResponseDto.fromEntity(s)),
     },
     {
       name: 'SessionGetChats',
