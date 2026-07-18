@@ -15,24 +15,25 @@ Self-hosted WhatsApp API gateway so Aarz (Hermes orchestrator) can send WhatsApp
 - [x] Fork `rmyndharis/OpenWA` → `Aarz-aaryan/OpenWA`
 - [x] Clone to `/home/Aarz/openwa`
 - [x] Configure minimal `.env` (SQLite, headless Chromium, no Postgres/Redis/MinIO)
-- [ ] Bring up `docker compose up -d` (openwa-api + docker-proxy)
-- [ ] Aaryan scans QR via http://localhost:2785 (or Tailscale IP)
-- [ ] Generate dedicated session-scoped API key for Aarz
-- [ ] Wire Aarz → OpenWA REST (send text/media)
-- [ ] Wire webhook from OpenWA → Hermes (incoming messages)
-- [ ] End-to-end test: cron fires → Aaryan receives WhatsApp → Aaryan replies → Hermes logs it
-- [ ] Optional: expose MCP at `/mcp` so any Claude/agy agent can use WA as native tools
+- [x] Bring up `docker compose up -d` (openwa-api + docker-proxy)
+- [x] Aaryan scans QR via http://localhost:2785 (or Tailscale IP)
+- [x] Generate dedicated session-scoped API key for Aarz
+- [x] Wire Aarz → OpenWA REST (send text/media)
+- [x] End-to-end test: Aarz → Aaryan WhatsApp → confirmed received ✅
+- [ ] ~~Wire webhook OpenWA → Hermes (incoming messages)~~ — CANCELLED per Aaryan, channel is one-way outbound only
 
 ## What's Done
 - Repo forked + cloned (2026-07-18)
 - `.env` configured (SQLite default, ENGINE_TYPE=whatsapp-web.js, headless)
+- Docker stack running (openwa-api + docker-proxy, both healthy)
+- WhatsApp session `aarz` authenticated by Aaryan (phone +923****9201, pushName "Aaryan Tahir", status `ready`)
+- First end-to-end test send → HTTP 201, messageId `true_207928443289777@lid_3EB02058C4AD9AD583A_out` ✅ confirmed received by Aaryan
+- `openwa_send.py` helper resolves session by name (or auto-picks first ready) and calls correct endpoint `POST /api/sessions/{id}/messages/send-text`
 
 ## What's Left
-- Docker Compose stack running
-- QR auth for Aaryan's WhatsApp number
-- Hermes-Aarz ↔ OpenWA bridge (Python helper + Aarz tool integration)
-- Webhook receiver in Hermes for inbound replies
-- E2E test with real message to Aaryan
+- **NOT building inbound webhook** — Aaryan confirmed (2026-07-18) this channel is one-way outbound only: Aarz → Aaryan. He will NOT reply via WhatsApp to Aarz. Inbound messages are received by the WhatsApp session and dropped (no webhook registered).
+- (Optional, on request) Wire MCP mount at `/mcp` so any agy/Claude/Codex session can use WhatsApp as native tools
+- (Optional, on request) Move stack from Hermes host to r-server if Hermes needs cleanup
 
 ## Architecture
 
