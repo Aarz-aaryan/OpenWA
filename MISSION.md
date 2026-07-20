@@ -29,11 +29,16 @@ Self-hosted WhatsApp API gateway so Aarz (Hermes orchestrator) can send WhatsApp
 - WhatsApp session `aarz` authenticated by Aaryan (phone +923****9201, pushName "Aaryan Tahir", status `ready`)
 - First end-to-end test send → HTTP 201, messageId `true_207928443289777@lid_3EB02058C4AD9AD583A_out` ✅ confirmed received by Aaryan
 - `openwa_send.py` helper resolves session by name (or auto-picks first ready) and calls correct endpoint `POST /api/sessions/{id}/messages/send-text`
+- 2026-07-20 — discovered whatsapp-web.js requires OGG/Opus for PTT voice notes (WAV fails with Puppeteer `t: t` error). Helper now auto-transcodes via ffmpeg.
+- 2026-07-20 — voice note end-to-end test → HTTP 201, messageId `true_207928443289777@lid_3EB03370E1F182DAC5D327_out` ✅
+- 2026-07-20 — wired morning briefing cron (`1e2da068fa94`, `0 11 * * *`) to also send to WhatsApp via new STEP 7 in the prompt. Helper script location: `~/.hermes/profiles/aarz/scripts/openwa_send.py`. Backup of pre-edit prompt: `cron/prompt-backups/1e2da068fa94.PRE-WHATSAPP-PATCH.txt`.
 
 ## What's Left
 - **NOT building inbound webhook** — Aaryan confirmed (2026-07-18) this channel is one-way outbound only: Aarz → Aaryan. He will NOT reply via WhatsApp to Aarz. Inbound messages are received by the WhatsApp session and dropped (no webhook registered).
+- **First live cron run with WhatsApp** — tomorrow (2026-07-21) at 11am EDT, the morning briefing cron will fire and attempt the WhatsApp delivery. Aaryan should check WhatsApp then. If voice/text fails, will surface as warning in the Discord message.
 - (Optional, on request) Wire MCP mount at `/mcp` so any agy/Claude/Codex session can use WhatsApp as native tools
 - (Optional, on request) Move stack from Hermes host to r-server if Hermes needs cleanup
+- (Optional, on request) Add more crons to WhatsApp notify when Aaryan gives more rules
 
 ## Architecture
 
